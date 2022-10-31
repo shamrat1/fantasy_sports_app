@@ -1,24 +1,26 @@
 import 'package:dream11/constants.dart';
 import 'package:dream11/default_button_widget.dart';
-import 'package:dream11/match_tile_widget.dart';
 import 'package:dream11/player_model.dart';
 import 'package:dream11/room_model.dart';
+import 'package:dream11/states/my_temp_team_state.dart';
+import 'package:dream11/widgets/my_temp_team_view.dart';
 import 'package:flutter/material.dart';
 import 'package:dream11/match_model.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RoomScreen extends StatefulWidget {
+class RoomScreen extends ConsumerStatefulWidget {
   final Match match;
   final Room room;
   const RoomScreen({Key? key, required this.match, required this.room})
       : super(key: key);
 
   @override
-  State<RoomScreen> createState() => _RoomScreenState();
+  ConsumerState<RoomScreen> createState() => _RoomScreenState();
 }
 
-class _RoomScreenState extends State<RoomScreen>
+class _RoomScreenState extends ConsumerState<RoomScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 
@@ -45,80 +47,117 @@ class _RoomScreenState extends State<RoomScreen>
           ],
         ),
       ),
-      body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _getSingleItem(widget.room),
-              Container(
-                decoration: BoxDecoration(
-                  color: Constants.tileBgColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                child: TabBar(
-                  controller: tabController,
-                  tabs: [
-                    Tab(
-                      // text: "Upcoming",
-                      icon: Text(
-                        widget.match.teamOne!,
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).primaryColor,
-                            ),
-                      ),
+      body: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _getSingleItem(widget.room),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Constants.tileBgColor,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Tab(
-                      icon: Text(
-                        widget.match.teamTwo!,
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).primaryColor,
-                            ),
-                      ),
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    child: TabBar(
+                      controller: tabController,
+                      tabs: [
+                        Tab(
+                          // text: "Upcoming",
+                          icon: Text(
+                            widget.match.teamOne!,
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                          ),
+                        ),
+                        Tab(
+                          icon: Text(
+                            widget.match.teamTwo!,
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 50 * 11,
-                child: TabBarView(
-                  controller: tabController,
-                  children: [
-                    ListView.builder(
-                      itemCount: cricketers
-                          .where((element) => element.teamNo == 1)
-                          .toList()
-                          .length,
-                      itemBuilder: (context, index) {
-                        var player = cricketers
-                            .where((element) => element.teamNo == 1)
-                            .toList()[index];
+                  ),
+                  SizedBox(
+                    height: 60 * 11 + 60,
+                    child: TabBarView(
+                      controller: tabController,
+                      children: [
+                        Column(children: [
+                          for (var i = 0;
+                              i <
+                                  cricketers
+                                      .where((element) => element.teamNo == 1)
+                                      .toList()
+                                      .length;
+                              i++)
+                            _getPlayerWidget(cricketers
+                                .where((element) => element.teamNo == 1)
+                                .toList()[i])
+                        ]),
+                        Column(children: [
+                          for (var i = 0;
+                              i <
+                                  cricketers
+                                      .where((element) => element.teamNo == 2)
+                                      .toList()
+                                      .length;
+                              i++)
+                            _getPlayerWidget(cricketers
+                                .where((element) => element.teamNo == 2)
+                                .toList()[i])
+                        ]),
+                        // ListView.builder(
+                        //   itemCount: cricketers
+                        //       .where((element) => element.teamNo == 1)
+                        //       .toList()
+                        //       .length,
+                        //   itemBuilder: (context, index) {
+                        //     var player = cricketers
+                        //         .where((element) => element.teamNo == 1)
+                        //         .toList()[index];
 
-                        return _getPlayerWidget(player);
-                      },
-                    ),
-                    ListView.builder(
-                      itemCount: cricketers
-                          .where((element) => element.teamNo == 2)
-                          .toList()
-                          .length,
-                      itemBuilder: (context, index) {
-                        var player = cricketers
-                            .where((element) => element.teamNo == 2)
-                            .toList()[index];
+                        //     return _getPlayerWidget(player);
+                        //   },
+                        // ),
+                        // ListView.builder(
+                        //   itemCount: cricketers
+                        //       .where((element) => element.teamNo == 2)
+                        //       .toList()
+                        //       .length,
+                        //   itemBuilder: (context, index) {
+                        //     var player = cricketers
+                        //         .where((element) => element.teamNo == 2)
+                        //         .toList()[index];
 
-                        return _getPlayerWidget(player);
-                      },
+                        //     return _getPlayerWidget(player);
+                        //   },
+                        // ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          const Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: MyTempTeamView(),
+          ),
+        ],
       ),
     );
   }
@@ -160,8 +199,11 @@ class _RoomScreenState extends State<RoomScreen>
               ],
             ),
           ),
-          const AppDefaultButton(
-            title: Icon(Icons.add),
+          AppDefaultButton(
+            title: const Icon(Icons.add),
+            onTap: () {
+              ref.read(myTempTeamProvider.notifier).add(player);
+            },
           ),
         ],
       ),
