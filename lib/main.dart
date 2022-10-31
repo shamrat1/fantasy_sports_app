@@ -3,6 +3,7 @@ import 'package:dream11/match_screen.dart';
 import 'package:dream11/match_tile_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:jiffy/jiffy.dart';
@@ -17,6 +18,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Colors.red, statusBarIconBrightness: Brightness.light));
     return Sizer(
       builder: ((context, orientation, deviceType) {
         return MaterialApp(
@@ -72,38 +75,39 @@ class _HomePageState extends State<HomePage>
                   .copyWith(color: Colors.white),
             ),
             bottom: PreferredSize(
-                child: TabBar(
-                  controller: controller,
-                  tabs: [
-                    Tab(
-                      // text: "Upcoming",
-                      icon: Text(
-                        "Upcoming",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.white,
-                            ),
-                      ),
+              child: TabBar(
+                controller: controller,
+                tabs: [
+                  Tab(
+                    // text: "Upcoming",
+                    icon: Text(
+                      "Upcoming",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.white,
+                          ),
                     ),
-                    Tab(
-                      icon: Text(
-                        "Live",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.white,
-                            ),
-                      ),
+                  ),
+                  Tab(
+                    icon: Text(
+                      "Live",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.white,
+                          ),
                     ),
-                    Tab(
-                      icon: Text(
-                        "Results",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.white,
-                            ),
-                      ),
+                  ),
+                  Tab(
+                    icon: Text(
+                      "Results",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.white,
+                          ),
                     ),
-                  ],
-                  isScrollable: true,
-                ),
-                preferredSize: const Size.fromHeight(50.0)),
+                  ),
+                ],
+                isScrollable: true,
+              ),
+              preferredSize: const Size.fromHeight(50.0),
+            ),
           ),
 
           // slider

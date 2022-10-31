@@ -1,33 +1,48 @@
 import 'package:dream11/constants.dart';
 import 'package:dream11/default_button_widget.dart';
 import 'package:dream11/match_tile_widget.dart';
+import 'package:dream11/player_model.dart';
 import 'package:dream11/room_model.dart';
-import 'package:dream11/room_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dream11/match_model.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:sizer/sizer.dart';
 
-class MatchScreen extends StatefulWidget {
+class RoomScreen extends StatefulWidget {
   final Match match;
-  const MatchScreen({Key? key, required this.match}) : super(key: key);
+  final Room room;
+  const RoomScreen({Key? key, required this.match, required this.room})
+      : super(key: key);
 
   @override
-  State<MatchScreen> createState() => _MatchScreenState();
+  State<RoomScreen> createState() => _RoomScreenState();
 }
 
-class _MatchScreenState extends State<MatchScreen> {
+class _RoomScreenState extends State<RoomScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    tabController = TabController(length: 2, vsync: this);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          widget.match.teamOne! + " V " + widget.match.teamTwo!,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(color: Colors.white),
+        title: Column(
+          children: [
+            Text(
+              widget.room.name!,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.white),
+            ),
+          ],
         ),
       ),
       body: Container(
@@ -35,8 +50,72 @@ class _MatchScreenState extends State<MatchScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              MatchTileWidget(match: widget.match),
-              for (var i = 0; i < rooms.length; i++) _getSingleItem(rooms[i]),
+              _getSingleItem(widget.room),
+              Container(
+                decoration: BoxDecoration(
+                  color: Constants.tileBgColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: TabBar(
+                  controller: tabController,
+                  tabs: [
+                    Tab(
+                      // text: "Upcoming",
+                      icon: Text(
+                        widget.match.teamOne!,
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                      ),
+                    ),
+                    Tab(
+                      icon: Text(
+                        widget.match.teamTwo!,
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 50 * 11,
+                child: TabBarView(
+                  controller: tabController,
+                  children: [
+                    ListView.builder(
+                      itemCount: cricketers
+                          .where((element) => element.teamNo == 1)
+                          .toList()
+                          .length,
+                      itemBuilder: (context, index) {
+                        var player = cricketers
+                            .where((element) => element.teamNo == 1)
+                            .toList()[index];
+
+                        return _getPlayerWidget(player);
+                      },
+                    ),
+                    ListView.builder(
+                      itemCount: cricketers
+                          .where((element) => element.teamNo == 2)
+                          .toList()
+                          .length,
+                      itemBuilder: (context, index) {
+                        var player = cricketers
+                            .where((element) => element.teamNo == 2)
+                            .toList()[index];
+
+                        return _getPlayerWidget(player);
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -44,18 +123,52 @@ class _MatchScreenState extends State<MatchScreen> {
     );
   }
 
+  Widget _getPlayerWidget(Player player) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Constants.tileBgColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: 70.w,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  player.name!,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: Theme.of(context).primaryColor),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  Constants.getPlayerRoleText(player.role!),
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const AppDefaultButton(
+            title: Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
   Path _buildBoatPath(Size size) {
-    // return Path()
-    //   // ..moveTo(15, 120)
-    //   ..lineTo(0, 85)
-    //   ..lineTo(50, 85)
-    //   ..lineTo(50, 0)
-    //   ..lineTo(105, 80)
-    //   ..lineTo(60, 80)
-    //   ..lineTo(60, 85)
-    //   ..lineTo(120, 85)
-    //   ..lineTo(105, 120)
-    //   ..close();
     Path path = Path();
     path.addRRect(RRect.fromRectAndRadius(
         Rect.fromLTWH(0, 8, size.width, size.height), Radius.circular(16)));
@@ -69,18 +182,11 @@ class _MatchScreenState extends State<MatchScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            room.name!,
+            widget.match.teamOne! + " V " + widget.match.teamTwo!,
             style: Theme.of(context)
                 .textTheme
                 .headline6!
-                .copyWith(color: Colors.black),
-          ),
-          Text(
-            room.subtitle!,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: Colors.grey),
+                .copyWith(color: Theme.of(context).primaryColor),
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
@@ -143,22 +249,9 @@ class _MatchScreenState extends State<MatchScreen> {
                                     .copyWith(
                                         color: Colors.black, fontSize: 9.sp),
                               ),
-                              AppDefaultButton(
-                                title: Text(
-                                  "Join Now",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(color: Colors.white),
-                                ),
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (ctx) => RoomScreen(
-                                            match: widget.match,
-                                            room: room,
-                                          )));
-                                },
-                              )
+                              const SizedBox(
+                                height: 30,
+                              ),
                             ],
                           ),
                         )
