@@ -10,10 +10,13 @@ class MyTempTeamProvider extends StateNotifier<List<Player>> {
   MyTempTeamProvider() : super([]);
 
   add(Player player) {
-    state.add(player);
+    state = [...state, player];
   }
 
-  remove(int index) {
-    state.removeAt(index);
+  remove(Player player) {
+    state = [
+      for (var i = 0; i < state.length; i++)
+        if (player.name != state[i].name) state[i]
+    ];
   }
 }

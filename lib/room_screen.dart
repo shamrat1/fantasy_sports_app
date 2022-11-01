@@ -4,6 +4,7 @@ import 'package:dream11/player_model.dart';
 import 'package:dream11/room_model.dart';
 import 'package:dream11/states/my_temp_team_state.dart';
 import 'package:dream11/widgets/my_temp_team_view.dart';
+import 'package:dream11/widgets/player_list_item_view.dart';
 import 'package:flutter/material.dart';
 import 'package:dream11/match_model.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
@@ -102,9 +103,21 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                       .toList()
                                       .length;
                               i++)
-                            _getPlayerWidget(cricketers
-                                .where((element) => element.teamNo == 1)
-                                .toList()[i])
+                            PlayerListItemWidget(
+                              player: cricketers
+                                  .where((element) => element.teamNo == 1)
+                                  .toList()[i],
+                              actionWidget: AppDefaultButton(
+                                title: const Icon(Icons.add),
+                                onTap: () {
+                                  ref.read(myTempTeamProvider.notifier).add(
+                                      cricketers
+                                          .where(
+                                              (element) => element.teamNo == 1)
+                                          .toList()[i]);
+                                },
+                              ),
+                            )
                         ]),
                         Column(children: [
                           for (var i = 0;
@@ -114,36 +127,22 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
                                       .toList()
                                       .length;
                               i++)
-                            _getPlayerWidget(cricketers
-                                .where((element) => element.teamNo == 2)
-                                .toList()[i])
+                            PlayerListItemWidget(
+                              player: cricketers
+                                  .where((element) => element.teamNo == 2)
+                                  .toList()[i],
+                              actionWidget: AppDefaultButton(
+                                title: const Icon(Icons.add),
+                                onTap: () {
+                                  ref.read(myTempTeamProvider.notifier).add(
+                                      cricketers
+                                          .where(
+                                              (element) => element.teamNo == 2)
+                                          .toList()[i]);
+                                },
+                              ),
+                            ),
                         ]),
-                        // ListView.builder(
-                        //   itemCount: cricketers
-                        //       .where((element) => element.teamNo == 1)
-                        //       .toList()
-                        //       .length,
-                        //   itemBuilder: (context, index) {
-                        //     var player = cricketers
-                        //         .where((element) => element.teamNo == 1)
-                        //         .toList()[index];
-
-                        //     return _getPlayerWidget(player);
-                        //   },
-                        // ),
-                        // ListView.builder(
-                        //   itemCount: cricketers
-                        //       .where((element) => element.teamNo == 2)
-                        //       .toList()
-                        //       .length,
-                        //   itemBuilder: (context, index) {
-                        //     var player = cricketers
-                        //         .where((element) => element.teamNo == 2)
-                        //         .toList()[index];
-
-                        //     return _getPlayerWidget(player);
-                        //   },
-                        // ),
                       ],
                     ),
                   ),
@@ -151,59 +150,11 @@ class _RoomScreenState extends ConsumerState<RoomScreen>
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: MyTempTeamView(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _getPlayerWidget(Player player) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Constants.tileBgColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SizedBox(
-            width: 70.w,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  player.name!,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: Theme.of(context).primaryColor),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  Constants.getPlayerRoleText(player.role!),
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          AppDefaultButton(
-            title: const Icon(Icons.add),
-            onTap: () {
-              ref.read(myTempTeamProvider.notifier).add(player);
-            },
           ),
         ],
       ),
